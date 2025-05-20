@@ -1,3 +1,4 @@
+<!-- index.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -34,6 +35,25 @@
                         </div>
                     </div>
                     <div class="form-group">
+                        <label for="role">Access Type</label>
+                        <div class="role-selection">
+                            <div class="role-option">
+                                <input type="radio" id="role-user" name="role" value="user" checked>
+                                <label for="role-user">
+                                    <i class="fas fa-user-graduate"></i>
+                                    <span>Researcher</span>
+                                </label>
+                            </div>
+                            <div class="role-option">
+                                <input type="radio" id="role-admin" name="role" value="admin">
+                                <label for="role-admin">
+                                    <i class="fas fa-user-shield"></i>
+                                    <span>Administrator</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
                         <button type="submit" class="login-btn">Login</button>
                     </div>
                     <div id="login-error" class="error-message"></div>
@@ -51,25 +71,28 @@
         </div>
     </div>
 
-    <!-- Dashboard Page (Initially Hidden) -->
-    <div id="dashboard-page" class="page">
+    <!-- Admin Dashboard Page (Initially Hidden) -->
+    <div id="admin-dashboard" class="page">
+        <!-- Admin navigation -->
         <header class="dashboard-header">
             <div class="logo-small">
                 <img src="assets/images/louisvillecardinal.png" alt="Cardinal Logo">
-                <h1>CRC Dashboard</h1>
+                <h1>CRC Admin Dashboard</h1>
             </div>
             <nav class="main-nav">
                 <ul>
-                    <li><a href="#" class="active">Overview</a></li>
-                    <li><a href="#">My Jobs</a></li>
-                    <li><a href="#">Cluster Status</a></li>
-                    <li><a href="#">Analytics</a></li>
-                    <li><a href="#">Help</a></li>
+                    <li><a href="#" class="active">Cluster Overview</a></li>
+                    <li><a href="#">Rack Status</a></li>
+                    <li><a href="#">Job Manager</a></li>
+                    <li><a href="#">Storage</a></li>
+                    <li><a href="#">Users</a></li>
+                    <li><a href="#">Settings</a></li>
                 </ul>
             </nav>
             <div class="user-menu">
-                <span id="username-display">User</span>
-                <button id="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</button>
+                <span class="user-role">Administrator</span>
+                <span id="admin-username">Admin</span>
+                <button id="admin-logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</button>
             </div>
         </header>
 
@@ -77,120 +100,393 @@
             <div class="page-header">
                 <h2>Cluster Overview</h2>
                 <div class="refresh-info">
-                    Last updated: <span id="last-update">May 20, 2025 14:30:45</span>
+                    Last updated: <span id="admin-last-update">May 20, 2025 14:30:45</span>
+                    <button id="refresh-btn" class="refresh-button">
+                        <i class="fas fa-sync-alt"></i> Refresh
+                    </button>
                 </div>
             </div>
             
-            <div class="dashboard-grid">
-                <!-- Cluster Status Card -->
-                <div class="card">
-                    <h3><i class="fas fa-server"></i> Cluster Status</h3>
-                    <div class="status-indicator online">
-                        <i class="fas fa-check-circle"></i> Online
+            <!-- Cluster Overview Section -->
+            <div class="overview-summary">
+                <div class="summary-card">
+                    <div class="summary-icon">
+                        <i class="fas fa-server"></i>
                     </div>
-                    
-                    <div class="cluster-stats">
-                        <div class="stat">
-                            <span id="total-nodes" class="stat-value">64</span>
-                            <span class="stat-label">Total Nodes</span>
+                    <div class="summary-data">
+                        <span class="summary-value">8/8</span>
+                        <span class="summary-label">Racks Online</span>
+                    </div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-icon">
+                        <i class="fas fa-microchip"></i>
+                    </div>
+                    <div class="summary-data">
+                        <span class="summary-value">312/320</span>
+                        <span class="summary-label">Nodes Online</span>
+                    </div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-icon">
+                        <i class="fas fa-tasks"></i>
+                    </div>
+                    <div class="summary-data">
+                        <span class="summary-value">186</span>
+                        <span class="summary-label">Active Jobs</span>
+                    </div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-icon">
+                        <i class="fas fa-hdd"></i>
+                    </div>
+                    <div class="summary-data">
+                        <span class="summary-value">68%</span>
+                        <span class="summary-label">Storage Used</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Rack Overview -->
+            <div class="section-heading">
+                <h3>Rack Status</h3>
+                <div class="section-controls">
+                    <select id="rack-view-type">
+                        <option value="utilization">Utilization</option>
+                        <option value="health">Health Status</option>
+                        <option value="jobs">Job Distribution</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="racks-grid">
+                <!-- Compute Rack 1 -->
+                <div class="rack-card">
+                    <div class="rack-header">
+                        <h4>Compute-1</h4>
+                        <span class="status-badge online">Online</span>
+                    </div>
+                    <div class="rack-body">
+                        <div class="utilization-meter">
+                            <div class="meter-track">
+                                <div class="meter-fill" style="width: 78%;"></div>
+                            </div>
+                            <div class="meter-label">
+                                <span class="meter-value">78%</span>
+                                <span class="meter-text">CPU Utilization</span>
+                            </div>
                         </div>
-                        <div class="stat">
-                            <span id="active-nodes" class="stat-value">48</span>
-                            <span class="stat-label">Active Nodes</span>
+                        <div class="rack-stats">
+                            <div class="rack-stat">
+                                <span class="stat-value">48/48</span>
+                                <span class="stat-label">Nodes</span>
+                            </div>
+                            <div class="rack-stat">
+                                <span class="stat-value">38</span>
+                                <span class="stat-label">Jobs</span>
+                            </div>
                         </div>
-                        <div class="stat">
-                            <span id="idle-nodes" class="stat-value">12</span>
-                            <span class="stat-label">Idle Nodes</span>
-                        </div>
-                        <div class="stat">
-                            <span id="down-nodes" class="stat-value">4</span>
-                            <span class="stat-label">Down Nodes</span>
-                        </div>
+                        <button class="view-details-btn">View Details</button>
                     </div>
                 </div>
                 
-                <!-- Job Queue Card -->
-                <div class="card">
-                    <h3><i class="fas fa-tasks"></i> Job Queue</h3>
-                    <div class="job-stats">
-                        <div class="stat">
-                            <span id="running-jobs" class="stat-value">156</span>
-                            <span class="stat-label">Running</span>
+                <!-- Compute Rack 2 -->
+                <div class="rack-card">
+                    <div class="rack-header">
+                        <h4>Compute-2</h4>
+                        <span class="status-badge online">Online</span>
+                    </div>
+                    <div class="rack-body">
+                        <div class="utilization-meter">
+                            <div class="meter-track">
+                                <div class="meter-fill" style="width: 65%;"></div>
+                            </div>
+                            <div class="meter-label">
+                                <span class="meter-value">65%</span>
+                                <span class="meter-text">CPU Utilization</span>
+                            </div>
                         </div>
-                        <div class="stat">
-                            <span id="pending-jobs" class="stat-value">42</span>
-                            <span class="stat-label">Pending</span>
+                        <div class="rack-stats">
+                            <div class="rack-stat">
+                                <span class="stat-value">48/48</span>
+                                <span class="stat-label">Nodes</span>
+                            </div>
+                            <div class="rack-stat">
+                                <span class="stat-value">32</span>
+                                <span class="stat-label">Jobs</span>
+                            </div>
                         </div>
-                        <div class="stat">
-                            <span id="completed-jobs" class="stat-value">384</span>
-                            <span class="stat-label">Completed Today</span>
-                        </div>
+                        <button class="view-details-btn">View Details</button>
                     </div>
                 </div>
                 
-                <!-- CPU Usage Card -->
-                <div class="card">
-                    <h3><i class="fas fa-microchip"></i> CPU Utilization</h3>
-                    <div class="resource-chart">
-                        <div id="cpu-chart" class="placeholder-chart">
-                            <div class="chart-bar" style="height: 60%;"></div>
-                            <div class="chart-bar" style="height: 80%;"></div>
-                            <div class="chart-bar" style="height: 50%;"></div>
-                            <div class="chart-bar" style="height: 75%;"></div>
-                            <div class="chart-bar" style="height: 65%;"></div>
+                <!-- GPU Rack -->
+                <div class="rack-card">
+                    <div class="rack-header">
+                        <h4>GPU Rack</h4>
+                        <span class="status-badge online">Online</span>
+                    </div>
+                    <div class="rack-body">
+                        <div class="utilization-meter">
+                            <div class="meter-track">
+                                <div class="meter-fill" style="width: 92%;"></div>
+                            </div>
+                            <div class="meter-label">
+                                <span class="meter-value">92%</span>
+                                <span class="meter-text">GPU Utilization</span>
+                            </div>
                         </div>
-                        <div class="chart-legend">CPU Utilization (Last 24 Hours)</div>
+                        <div class="rack-stats">
+                            <div class="rack-stat">
+                                <span class="stat-value">32/32</span>
+                                <span class="stat-label">Nodes</span>
+                            </div>
+                            <div class="rack-stat">
+                                <span class="stat-value">28</span>
+                                <span class="stat-label">Jobs</span>
+                            </div>
+                        </div>
+                        <button class="view-details-btn">View Details</button>
                     </div>
                 </div>
                 
-                <!-- Storage Usage Card -->
-                <div class="card">
-                    <h3><i class="fas fa-hdd"></i> Storage Usage</h3>
-                    <div class="storage-section">
-                        <div id="storage-details" class="storage-details">287TB / 408TB Used</div>
+                <!-- High Memory Rack -->
+                <div class="rack-card">
+                    <div class="rack-header">
+                        <h4>High-Mem</h4>
+                        <span class="status-badge online">Online</span>
+                    </div>
+                    <div class="rack-body">
+                        <div class="utilization-meter">
+                            <div class="meter-track">
+                                <div class="meter-fill" style="width: 85%;"></div>
+                            </div>
+                            <div class="meter-label">
+                                <span class="meter-value">85%</span>
+                                <span class="meter-text">Memory Utilization</span>
+                            </div>
+                        </div>
+                        <div class="rack-stats">
+                            <div class="rack-stat">
+                                <span class="stat-value">24/24</span>
+                                <span class="stat-label">Nodes</span>
+                            </div>
+                            <div class="rack-stat">
+                                <span class="stat-value">18</span>
+                                <span class="stat-label">Jobs</span>
+                            </div>
+                        </div>
+                        <button class="view-details-btn">View Details</button>
                     </div>
                 </div>
                 
-                <!-- My Jobs Card -->
-                <div class="card full-width">
-                    <h3><i class="fas fa-clipboard-list"></i> My Recent Jobs</h3>
-                    <div class="table-container">
-                        <table class="jobs-table">
-                            <thead>
-                                <tr>
-                                    <th>Job ID</th>
-                                    <th>Name</th>
-                                    <th>Status</th>
-                                    <th>Runtime</th>
-                                    <th>Nodes</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>12345</td>
-                                    <td>data-analysis</td>
-                                    <td><span class="status running">Running</span></td>
-                                    <td>01:23:45</td>
-                                    <td>2</td>
-                                </tr>
-                                <tr>
-                                    <td>12344</td>
-                                    <td>sim-batch-3</td>
-                                    <td><span class="status completed">Completed</span></td>
-                                    <td>05:30:22</td>
-                                    <td>4</td>
-                                </tr>
-                                <tr>
-                                    <td>12343</td>
-                                    <td>test-gpu</td>
-                                    <td><span class="status pending">Pending</span></td>
-                                    <td>--:--:--</td>
-                                    <td>1</td>
-                                </tr>
-                            </tbody>
-                        </table>
+                <!-- Storage Rack 1 -->
+                <div class="rack-card">
+                    <div class="rack-header">
+                        <h4>Storage-1</h4>
+                        <span class="status-badge online">Online</span>
+                    </div>
+                    <div class="rack-body">
+                        <div class="utilization-meter">
+                            <div class="meter-track">
+                                <div class="meter-fill" style="width: 72%;"></div>
+                            </div>
+                            <div class="meter-label">
+                                <span class="meter-value">72%</span>
+                                <span class="meter-text">Storage Used</span>
+                            </div>
+                        </div>
+                        <div class="rack-stats">
+                            <div class="rack-stat">
+                                <span class="stat-value">16/16</span>
+                                <span class="stat-label">Nodes</span>
+                            </div>
+                            <div class="rack-stat">
+                                <span class="stat-value">180 TB</span>
+                                <span class="stat-label">Capacity</span>
+                            </div>
+                        </div>
+                        <button class="view-details-btn">View Details</button>
                     </div>
                 </div>
+                
+                <!-- Storage Rack 2 -->
+                <div class="rack-card">
+                    <div class="rack-header">
+                        <h4>Storage-2</h4>
+                        <span class="status-badge online">Online</span>
+                    </div>
+                    <div class="rack-body">
+                        <div class="utilization-meter">
+                            <div class="meter-track">
+                                <div class="meter-fill" style="width: 65%;"></div>
+                            </div>
+                            <div class="meter-label">
+                                <span class="meter-value">65%</span>
+                                <span class="meter-text">Storage Used</span>
+                            </div>
+                        </div>
+                        <div class="rack-stats">
+                            <div class="rack-stat">
+                                <span class="stat-value">16/16</span>
+                                <span class="stat-label">Nodes</span>
+                            </div>
+                            <div class="rack-stat">
+                                <span class="stat-value">180 TB</span>
+                                <span class="stat-label">Capacity</span>
+                            </div>
+                        </div>
+                        <button class="view-details-btn">View Details</button>
+                    </div>
+                </div>
+                
+                <!-- Interactive Rack -->
+                <div class="rack-card">
+                    <div class="rack-header">
+                        <h4>Interactive</h4>
+                        <span class="status-badge online">Online</span>
+                    </div>
+                    <div class="rack-body">
+                        <div class="utilization-meter">
+                            <div class="meter-track">
+                                <div class="meter-fill" style="width: 45%;"></div>
+                            </div>
+                            <div class="meter-label">
+                                <span class="meter-value">45%</span>
+                                <span class="meter-text">CPU Utilization</span>
+                            </div>
+                        </div>
+                        <div class="rack-stats">
+                            <div class="rack-stat">
+                                <span class="stat-value">16/16</span>
+                                <span class="stat-label">Nodes</span>
+                            </div>
+                            <div class="rack-stat">
+                                <span class="stat-value">24</span>
+                                <span class="stat-label">Users</span>
+                            </div>
+                        </div>
+                        <button class="view-details-btn">View Details</button>
+                    </div>
+                </div>
+                
+                <!-- Management Rack -->
+                <div class="rack-card">
+                    <div class="rack-header">
+                        <h4>Management</h4>
+                        <span class="status-badge online">Online</span>
+                    </div>
+                    <div class="rack-body">
+                        <div class="utilization-meter">
+                            <div class="meter-track">
+                                <div class="meter-fill" style="width: 38%;"></div>
+                            </div>
+                            <div class="meter-label">
+                                <span class="meter-value">38%</span>
+                                <span class="meter-text">CPU Utilization</span>
+                            </div>
+                        </div>
+                        <div class="rack-stats">
+                            <div class="rack-stat">
+                                <span class="stat-value">8/8</span>
+                                <span class="stat-label">Nodes</span>
+                            </div>
+                            <div class="rack-stat">
+                                <span class="stat-value">System</span>
+                                <span class="stat-label">Type</span>
+                            </div>
+                        </div>
+                        <button class="view-details-btn">View Details</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Active Jobs Overview -->
+            <div class="section-heading">
+                <h3>Active Jobs Overview</h3>
+                <div class="section-controls">
+                    <button class="action-button">View All Jobs</button>
+                </div>
+            </div>
+            
+            <div class="jobs-table-container">
+                <table class="admin-jobs-table">
+                    <thead>
+                        <tr>
+                            <th>Job ID</th>
+                            <th>User</th>
+                            <th>Partition</th>
+                            <th>Nodes</th>
+                            <th>Status</th>
+                            <th>Started</th>
+                            <th>Runtime</th>
+                            <th>Progress</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>12350</td>
+                            <td>jsmith42</td>
+                            <td>gpu</td>
+                            <td>2</td>
+                            <td><span class="status running">Running</span></td>
+                            <td>May 20, 10:15</td>
+                            <td>04:23:12</td>
+                            <td>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 75%;"></div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="icon-button" title="View Details"><i class="fas fa-eye"></i></button>
+                                    <button class="icon-button warning" title="Cancel Job"><i class="fas fa-times"></i></button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>12349</td>
+                            <td>ayang3</td>
+                            <td>compute-1</td>
+                            <td>4</td>
+                            <td><span class="status running">Running</span></td>
+                            <td>May 20, 09:45</td>
+                            <td>04:52:26</td>
+                            <td>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 62%;"></div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="icon-button" title="View Details"><i class="fas fa-eye"></i></button>
+                                    <button class="icon-button warning" title="Cancel Job"><i class="fas fa-times"></i></button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>12348</td>
+                            <td>mgarcia7</td>
+                            <td>high-mem</td>
+                            <td>1</td>
+                            <td><span class="status running">Running</span></td>
+                            <td>May 20, 08:30</td>
+                            <td>06:07:41</td>
+                            <td>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 88%;"></div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="icon-button" title="View Details"><i class="fas fa-eye"></i></button>
+                                    <button class="icon-button warning" title="Cancel Job"><i class="fas fa-times"></i></button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </main>
 
@@ -199,7 +495,480 @@
         </footer>
     </div>
 
-    <!-- Simplified JavaScript -->
+    <!-- User Dashboard Page (Initially Hidden) -->
+    <div id="user-dashboard" class="page">
+        <header class="dashboard-header">
+            <div class="logo-small">
+                <img src="assets/images/louisvillecardinal.png" alt="Cardinal Logo">
+                <h1>CRC Dashboard</h1>
+            </div>
+            <nav class="main-nav">
+                <ul>
+                    <li><a href="#" class="active">My Jobs</a></li>
+                    <li><a href="#">Submit Job</a></li>
+                    <li><a href="#">Resources</a></li>
+                    <li><a href="#">Help</a></li>
+                </ul>
+            </nav>
+            <div class="user-menu">
+                <span class="user-role">Researcher</span>
+                <span id="user-username">User</span>
+                <button id="user-logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</button>
+            </div>
+        </header>
+
+        <main class="dashboard-content">
+            <div class="page-header">
+                <h2>My Jobs</h2>
+                <div class="refresh-info">
+                    Last updated: <span id="user-last-update">May 20, 2025 14:30:45</span>
+                    <button id="user-refresh-btn" class="refresh-button">
+                        <i class="fas fa-sync-alt"></i> Refresh
+                    </button>
+                </div>
+            </div>
+            
+            <!-- User Quick Stats -->
+            <div class="user-stats-container">
+                <div class="user-stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-play-circle"></i>
+                    </div>
+                    <div class="stat-info">
+                        <span class="stat-number">3</span>
+                        <span class="stat-name">Running Jobs</span>
+                    </div>
+                </div>
+                <div class="user-stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="stat-info">
+                        <span class="stat-number">2</span>
+                        <span class="stat-name">Pending Jobs</span>
+                    </div>
+                </div>
+                <div class="user-stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="stat-info">
+                        <span class="stat-number">12</span>
+                        <span class="stat-name">Completed Jobs</span>
+                    </div>
+                </div>
+                <div class="user-stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-microchip"></i>
+                    </div>
+                    <div class="stat-info">
+                        <span class="stat-number">48</span>
+                        <span class="stat-name">Core Hours Used</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Running Jobs Section -->
+            <div class="section-heading">
+                <h3>Running Jobs</h3>
+                <div class="section-controls">
+                    <button class="action-button primary">Submit New Job</button>
+                </div>
+            </div>
+            
+            <div class="job-cards-container">
+                <!-- Job 1 -->
+                <div class="job-card">
+                    <div class="job-card-header">
+                        <div class="job-title">
+                            <h4>data-analysis-2025</h4>
+                            <span class="job-id">ID: 12350</span>
+                        </div>
+                        <span class="status running">Running</span>
+                    </div>
+                    <div class="job-card-body">
+                        <div class="job-info-grid">
+                            <div class="job-info-item">
+                                <label>Partition:</label>
+                                <span>gpu</span>
+                            </div>
+                            <div class="job-info-item">
+                                <label>Nodes:</label>
+                                <span>2</span>
+                            </div>
+                            <div class="job-info-item">
+                                <label>CPU Cores:</label>
+                                <span>16</span>
+                            </div>
+                            <div class="job-info-item">
+                                <label>Memory:</label>
+                                <span>64 GB</span>
+                            </div>
+                            <div class="job-info-item">
+                                <label>Started:</label>
+                                <span>May 20, 10:15</span>
+                            </div>
+                            <div class="job-info-item">
+                                <label>Runtime:</label>
+                                <span>04:23:12</span>
+                            </div>
+                        </div>
+                        <div class="job-progress">
+                            <div class="progress-label">
+                                <span>Progress:</span>
+                                <span>75%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 75%;"></div>
+                            </div>
+                        </div>
+                        <div class="resource-usage">
+                            <div class="resource-usage-item">
+                                <label>CPU:</label>
+                                <div class="mini-gauge">
+                                    <div class="mini-gauge-fill" style="width: 85%;"></div>
+                                </div>
+                                <span>85%</span>
+                            </div>
+                            <div class="resource-usage-item">
+                                <label>GPU:</label>
+                                <div class="mini-gauge">
+                                    <div class="mini-gauge-fill" style="width: 92%;"></div>
+                                </div>
+                                <span>92%</span>
+                            </div>
+                            <div class="resource-usage-item">
+                                <label>Memory:</label>
+                                <div class="mini-gauge">
+                                    <div class="mini-gauge-fill" style="width: 78%;"></div>
+                                </div>
+                                <span>78%</span>
+                            </div>
+                        </div>
+                        <div class="job-actions">
+                            <button class="job-action-btn"><i class="fas fa-eye"></i> View Output</button>
+                            <button class="job-action-btn warning"><i class="fas fa-times"></i> Cancel</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Job 2 -->
+                <div class="job-card">
+                    <div class="job-card-header">
+                        <div class="job-title">
+                            <h4>model-training</h4>
+                            <span class="job-id">ID: 12349</span>
+                        </div>
+                        <span class="status running">Running</span>
+                    </div>
+                    <div class="job-card-body">
+                        <div class="job-info-grid">
+                            <div class="job-info-item">
+                                <label>Partition:</label>
+                                <span>compute-1</span>
+                            </div>
+                            <div class="job-info-item">
+                                <label>Nodes:</label>
+                                <span>4</span>
+                            </div>
+                            <div class="job-info-item">
+                                <label>CPU Cores:</label>
+                                <span>32</span>
+                            </div>
+                            <div class="job-info-item">
+                                <label>Memory:</label>
+                                <span>128 GB</span>
+                            </div>
+                            <div class="job-info-item">
+                                <label>Started:</label>
+                                <span>May 20, 09:45</span>
+                            </div>
+                            <div class="job-info-item">
+                                <label>Runtime:</label>
+                                <span>04:52:26</span>
+                            </div>
+                        </div>
+                        <div class="job-progress">
+                            <div class="progress-label">
+                                <span>Progress:</span>
+                                <span>62%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 62%;"></div>
+                            </div>
+                        </div>
+                        <div class="resource-usage">
+                            <div class="resource-usage-item">
+                                <label>CPU:</label>
+                                <div class="mini-gauge">
+                                    <div class="mini-gauge-fill" style="width: 95%;"></div>
+                                </div>
+                                <span>95%</span>
+                            </div>
+                            <div class="resource-usage-item">
+                                <label>Memory:</label>
+                                <div class="mini-gauge">
+                                    <div class="mini-gauge-fill" style="width: 84%;"></div>
+                                </div>
+                                <span>84%</span>
+                            </div>
+                        </div>
+                        <div class="job-actions">
+                            <button class="job-action-btn"><i class="fas fa-eye"></i> View Output</button>
+                            <button class="job-action-btn warning"><i class="fas fa-times"></i> Cancel</button>
+                        </div>
+                    </div>
+                    </div>
+                
+                <!-- Job 3 -->
+                <div class="job-card">
+                    <div class="job-card-header">
+                        <div class="job-title">
+                            <h4>genome-assembly</h4>
+                            <span class="job-id">ID: 12348</span>
+                        </div>
+                        <span class="status running">Running</span>
+                    </div>
+                    <div class="job-card-body">
+                        <div class="job-info-grid">
+                            <div class="job-info-item">
+                                <label>Partition:</label>
+                                <span>high-mem</span>
+                            </div>
+                            <div class="job-info-item">
+                                <label>Nodes:</label>
+                                <span>1</span>
+                            </div>
+                            <div class="job-info-item">
+                                <label>CPU Cores:</label>
+                                <span>8</span>
+                            </div>
+                            <div class="job-info-item">
+                                <label>Memory:</label>
+                                <span>256 GB</span>
+                            </div>
+                            <div class="job-info-item">
+                                <label>Started:</label>
+                                <span>May 20, 08:30</span>
+                            </div>
+                            <div class="job-info-item">
+                                <label>Runtime:</label>
+                                <span>06:07:41</span>
+                            </div>
+                        </div>
+                        <div class="job-progress">
+                            <div class="progress-label">
+                                <span>Progress:</span>
+                                <span>88%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 88%;"></div>
+                            </div>
+                        </div>
+                        <div class="resource-usage">
+                            <div class="resource-usage-item">
+                                <label>CPU:</label>
+                                <div class="mini-gauge">
+                                    <div class="mini-gauge-fill" style="width: 72%;"></div>
+                                </div>
+                                <span>72%</span>
+                            </div>
+                            <div class="resource-usage-item">
+                                <label>Memory:</label>
+                                <div class="mini-gauge">
+                                    <div class="mini-gauge-fill" style="width: 95%;"></div>
+                                </div>
+                                <span>95%</span>
+                            </div>
+                        </div>
+                        <div class="job-actions">
+                            <button class="job-action-btn"><i class="fas fa-eye"></i> View Output</button>
+                            <button class="job-action-btn warning"><i class="fas fa-times"></i> Cancel</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Pending Jobs Section -->
+            <div class="section-heading">
+                <h3>Pending Jobs</h3>
+            </div>
+            
+            <div class="job-cards-container">
+                <!-- Pending Job 1 -->
+                <div class="job-card pending">
+                    <div class="job-card-header">
+                        <div class="job-title">
+                            <h4>simulation-run-4</h4>
+                            <span class="job-id">ID: 12352</span>
+                        </div>
+                        <span class="status pending">Pending</span>
+                    </div>
+                    <div class="job-card-body">
+                        <div class="job-info-grid">
+                            <div class="job-info-item">
+                                <label>Partition:</label>
+                                <span>compute-2</span>
+                            </div>
+                            <div class="job-info-item">
+                                <label>Nodes:</label>
+                                <span>2</span>
+                            </div>
+                            <div class="job-info-item">
+                                <label>CPU Cores:</label>
+                                <span>16</span>
+                            </div>
+                            <div class="job-info-item">
+                                <label>Memory:</label>
+                                <span>64 GB</span>
+                            </div>
+                            <div class="job-info-item">
+                                <label>Submitted:</label>
+                                <span>May 20, 13:05</span>
+                            </div>
+                            <div class="job-info-item">
+                                <label>Est. Wait:</label>
+                                <span>~0:45:00</span>
+                            </div>
+                        </div>
+                        <div class="queue-position">
+                            <div class="queue-label">Queue Position:</div>
+                            <div class="queue-badge">3</div>
+                        </div>
+                        <div class="job-actions">
+                            <button class="job-action-btn"><i class="fas fa-file-alt"></i> View Script</button>
+                            <button class="job-action-btn warning"><i class="fas fa-times"></i> Cancel</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Pending Job 2 -->
+                <div class="job-card pending">
+                    <div class="job-card-header">
+                        <div class="job-title">
+                            <h4>data-visualization</h4>
+                            <span class="job-id">ID: 12353</span>
+                        </div>
+                        <span class="status pending">Pending</span>
+                    </div>
+                    <div class="job-card-body">
+                        <div class="job-info-grid">
+                            <div class="job-info-item">
+                                <label>Partition:</label>
+                                <span>compute-1</span>
+                            </div>
+                            <div class="job-info-item">
+                                <label>Nodes:</label>
+                                <span>1</span>
+                            </div>
+                            <div class="job-info-item">
+                                <label>CPU Cores:</label>
+                                <span>4</span>
+                            </div>
+                            <div class="job-info-item">
+                                <label>Memory:</label>
+                                <span>16 GB</span>
+                            </div>
+                            <div class="job-info-item">
+                                <label>Submitted:</label>
+                                <span>May 20, 14:20</span>
+                            </div>
+                            <div class="job-info-item">
+                                <label>Est. Wait:</label>
+                                <span>~1:15:00</span>
+                            </div>
+                        </div>
+                        <div class="queue-position">
+                            <div class="queue-label">Queue Position:</div>
+                            <div class="queue-badge">8</div>
+                        </div>
+                        <div class="job-actions">
+                            <button class="job-action-btn"><i class="fas fa-file-alt"></i> View Script</button>
+                            <button class="job-action-btn warning"><i class="fas fa-times"></i> Cancel</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Recently Completed Jobs -->
+            <div class="section-heading">
+                <h3>Recently Completed Jobs</h3>
+                <div class="section-controls">
+                    <button class="action-button">View Job History</button>
+                </div>
+            </div>
+            
+            <div class="table-container">
+                <table class="jobs-table">
+                    <thead>
+                        <tr>
+                            <th>Job ID</th>
+                            <th>Name</th>
+                            <th>Partition</th>
+                            <th>Status</th>
+                            <th>Started</th>
+                            <th>Completed</th>
+                            <th>Runtime</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>12347</td>
+                            <td>test-analysis</td>
+                            <td>compute-1</td>
+                            <td><span class="status completed">Completed</span></td>
+                            <td>May 19, 15:30</td>
+                            <td>May 19, 18:45</td>
+                            <td>03:15:22</td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="icon-button" title="View Output"><i class="fas fa-eye"></i></button>
+                                    <button class="icon-button" title="Download Results"><i class="fas fa-download"></i></button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>12345</td>
+                            <td>data-preprocessing</td>
+                            <td>compute-2</td>
+                            <td><span class="status completed">Completed</span></td>
+                            <td>May 19, 10:15</td>
+                            <td>May 19, 11:30</td>
+                            <td>01:15:48</td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="icon-button" title="View Output"><i class="fas fa-eye"></i></button>
+                                    <button class="icon-button" title="Download Results"><i class="fas fa-download"></i></button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>12344</td>
+                            <td>gpu-benchmark</td>
+                            <td>gpu</td>
+                            <td><span class="status failed">Failed</span></td>
+                            <td>May 18, 14:20</td>
+                            <td>May 18, 14:25</td>
+                            <td>00:05:12</td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="icon-button" title="View Output"><i class="fas fa-eye"></i></button>
+                                    <button class="icon-button" title="Restart Job"><i class="fas fa-redo-alt"></i></button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </main>
+
+        <footer class="dashboard-footer">
+            <p>UofL Research Computing | Contact: <a href="mailto:ithpc@louisville.edu">ithpc@louisville.edu</a></p>
+        </footer>
+    </div>
+
+    <!-- Simplified JavaScript for login routing -->
     <script src="js/app.js"></script>
 </body>
 </html>

@@ -1,46 +1,89 @@
 document.addEventListener('DOMContentLoaded', function() {
     // Demo credentials (in a real app, this would be handled server-side)
     const demoCredentials = {
-        username: 'admin',
-        password: 'password123'
+        admin: {
+            username: 'admin',
+            password: '123'
+        },
+        user: {
+            username: 'user',
+            password: '123'
+        }
     };
 
     // DOM element references
     const loginForm = document.getElementById('login-form');
     const loginError = document.getElementById('login-error');
-    const usernameDisplay = document.getElementById('username-display');
-    const logoutBtn = document.getElementById('logout-btn');
-    const lastUpdateEl = document.getElementById('last-update');
-
+    
+    const adminUsernameDisplay = document.getElementById('admin-username');
+    const userUsernameDisplay = document.getElementById('user-username');
+    
+    const adminLogoutBtn = document.getElementById('admin-logout-btn');
+    const userLogoutBtn = document.getElementById('user-logout-btn');
+    
+    const adminLastUpdateEl = document.getElementById('admin-last-update');
+    const userLastUpdateEl = document.getElementById('user-last-update');
+    
     // Handle login form submission
     loginForm.addEventListener('submit', function(e) {
         e.preventDefault();
         
         const username = document.getElementById('username').value;
         const password = document.getElementById('password').value;
+        const role = document.querySelector('input[name="role"]:checked').value;
         
-        // Simple authentication (for demo purposes only)
-        if (username === demoCredentials.username && password === demoCredentials.password) {
+        // Determine which credentials to check based on selected role
+        let isValidCredentials = false;
+        let dashboardId = '';
+        let usernameDisplay = null;
+        
+        if (role === 'admin') {
+            isValidCredentials = (username === demoCredentials.admin.username && 
+                                 password === demoCredentials.admin.password);
+            dashboardId = 'admin-dashboard';
+            usernameDisplay = adminUsernameDisplay;
+        } else {
+            isValidCredentials = (username === demoCredentials.user.username && 
+                                 password === demoCredentials.user.password);
+            dashboardId = 'user-dashboard';
+            usernameDisplay = userUsernameDisplay;
+        }
+        
+        if (isValidCredentials) {
             // Successful login
             loginError.textContent = '';
             usernameDisplay.textContent = username;
             
-            // Switch to dashboard page
+            // Switch to appropriate dashboard
             document.getElementById('login-page').classList.remove('active');
-            document.getElementById('dashboard-page').classList.add('active');
+            document.getElementById(dashboardId).classList.add('active');
             
             // Start mock data updates
-            startMockUpdates();
+            startMockUpdates(role);
         } else {
             // Failed login
             loginError.textContent = 'Invalid username or password. Please try again.';
         }
     });
 
-    // Handle logout
-    logoutBtn.addEventListener('click', function() {
+    // Handle admin logout
+    if (adminLogoutBtn) {
+        adminLogoutBtn.addEventListener('click', function() {
+            logoutUser('admin-dashboard');
+        });
+    }
+    
+    // Handle user logout
+    if (userLogoutBtn) {
+        userLogoutBtn.addEventListener('click', function() {
+            logoutUser('user-dashboard');
+        });
+    }
+    
+    // Logout function
+    function logoutUser(dashboardId) {
         // Switch back to login page
-        document.getElementById('dashboard-page').classList.remove('active');
+        document.getElementById(dashboardId).classList.remove('active');
         document.getElementById('login-page').classList.add('active');
         
         // Clear form fields
@@ -50,26 +93,29 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Stop mock updates
         stopMockUpdates();
-    });
+    }
 
     // Update timestamp
     function updateTimestamp() {
         const now = new Date();
-        lastUpdateEl.textContent = now.toLocaleString();
+        const timeString = now.toLocaleString();
+        
+        if (adminLastUpdateEl) adminLastUpdateEl.textContent = timeString;
+        if (userLastUpdateEl) userLastUpdateEl.textContent = timeString;
     }
     
     // Mock data update variables
     let updateInterval;
     
     // Start mock data updates
-    function startMockUpdates() {
+    function startMockUpdates(role) {
         // Update immediately
-        updateMockData();
+        updateMockData(role);
         updateTimestamp();
         
         // Then update every 5 seconds
         updateInterval = setInterval(function() {
-            updateMockData();
+            updateMockData(role);
             updateTimestamp();
         }, 5000);
     }
@@ -79,52 +125,138 @@ document.addEventListener('DOMContentLoaded', function() {
         clearInterval(updateInterval);
     }
     
+    // Add refresh button event listeners
+    const adminRefreshBtn = document.getElementById('refresh-btn');
+    if (adminRefreshBtn) {
+        adminRefreshBtn.addEventListener('click', function() {
+            updateMockData('admin');
+            updateTimestamp();
+            
+            // Add a refreshing animation
+            this.classList.add('refreshing');
+            setTimeout(() => {
+                this.classList.remove('refreshing');
+            }, 1000);
+        });
+    }
+    
+    const userRefreshBtn = document.getElementById('user-refresh-btn');
+    if (userRefreshBtn) {
+        userRefreshBtn.addEventListener('click', function() {
+            updateMockData('user');
+            updateTimestamp();
+            
+            // Add a refreshing animation
+            this.classList.add('refreshing');
+            setTimeout(() => {
+                this.classList.remove('refreshing');
+            }, 1000);
+        });
+    }
+    
     // Update mock data with random fluctuations
-    function updateMockData() {
-        // Update node counts with small random changes
-        const totalNodes = 64;
-        let activeNodes = parseInt(document.getElementById('active-nodes').textContent);
-        let change = Math.floor(Math.random() * 3) - 1; // -1, 0, or 1
-        
-        activeNodes = Math.max(30, Math.min(60, activeNodes + change));
-        const idleNodes = totalNodes - activeNodes - 4; // 4 is down nodes
-        
-        document.getElementById('active-nodes').textContent = activeNodes;
-        document.getElementById('idle-nodes').textContent = idleNodes;
-        
-        // Update job stats with small random changes
-        let runningJobs = parseInt(document.getElementById('running-jobs').textContent);
-        let pendingJobs = parseInt(document.getElementById('pending-jobs').textContent);
-        let completedJobs = parseInt(document.getElementById('completed-jobs').textContent);
-        
-        // Add some new jobs
-        const newJobs = Math.floor(Math.random() * 3);
-        pendingJobs += newJobs;
-        
-        // Complete some jobs
-        const finishedJobs = Math.floor(Math.random() * 3);
-        if (runningJobs > finishedJobs) {
-            runningJobs -= finishedJobs;
-            completedJobs += finishedJobs;
+    function updateMockData(role) {
+        if (role === 'admin') {
+            updateAdminDashboardData();
+        } else {
+            updateUserDashboardData();
         }
+    }
+    
+    // Update admin dashboard data
+    function updateAdminDashboardData() {
+        // Update rack utilization meters with small random changes
+        const utilizationMeters = document.querySelectorAll('.rack-card .meter-fill');
+        const utilizationValues = document.querySelectorAll('.rack-card .meter-value');
         
-        // Start some pending jobs
-        const startedJobs = Math.floor(Math.random() * 2);
-        if (pendingJobs >= startedJobs) {
-            pendingJobs -= startedJobs;
-            runningJobs += startedJobs;
-        }
+        utilizationMeters.forEach((meter, index) => {
+            let currentValue = parseInt(meter.style.width);
+            if (isNaN(currentValue)) currentValue = 70; // Default if not set
+            
+            // Random fluctuation between -5% and +5%
+            const change = Math.floor(Math.random() * 11) - 5;
+            const newValue = Math.max(10, Math.min(98, currentValue + change));
+            
+            meter.style.width = `${newValue}%`;
+            if (utilizationValues[index]) {
+                utilizationValues[index].textContent = `${newValue}%`;
+            }
+        });
         
-        document.getElementById('running-jobs').textContent = runningJobs;
-        document.getElementById('pending-jobs').textContent = pendingJobs;
-        document.getElementById('completed-jobs').textContent = completedJobs;
+        // Update job progress bars
+        const progressBars = document.querySelectorAll('.admin-jobs-table .progress-fill');
+        progressBars.forEach(bar => {
+            let currentValue = parseInt(bar.style.width);
+            if (isNaN(currentValue)) currentValue = 50; // Default if not set
+            
+            // Progress increases by 1-3%
+            const increase = Math.floor(Math.random() * 3) + 1;
+            const newValue = Math.min(100, currentValue + increase);
+            
+            bar.style.width = `${newValue}%`;
+        });
+    }
+    
+    // Update user dashboard data
+    function updateUserDashboardData() {
+        // Update job progress bars
+        const progressBars = document.querySelectorAll('.job-card .progress-fill');
+        const progressValues = document.querySelectorAll('.job-card .progress-label span:last-child');
         
-        // Update chart bars with random heights
-        const chartBars = document.querySelectorAll('.chart-bar');
-        chartBars.forEach(bar => {
-            const currentHeight = parseInt(bar.style.height);
-            const newHeight = Math.max(20, Math.min(90, currentHeight + Math.floor(Math.random() * 20) - 10));
-            bar.style.height = newHeight + '%';
+        progressBars.forEach((bar, index) => {
+            let currentValue = parseInt(bar.style.width);
+            if (isNaN(currentValue)) currentValue = 50; // Default if not set
+            
+            // Progress increases by 1-3%
+            const increase = Math.floor(Math.random() * 3) + 1;
+            const newValue = Math.min(100, currentValue + increase);
+            
+            bar.style.width = `${newValue}%`;
+            if (progressValues[index]) {
+                progressValues[index].textContent = `${newValue}%`;
+            }
+        });
+        
+        // Update resource usage mini-gauges
+        const miniGauges = document.querySelectorAll('.resource-usage-item .mini-gauge-fill');
+        const gaugeValues = document.querySelectorAll('.resource-usage-item span:last-child');
+        
+        miniGauges.forEach((gauge, index) => {
+            let currentValue = parseInt(gauge.style.width);
+            if (isNaN(currentValue)) currentValue = 70; // Default if not set
+            
+            // Random fluctuation between -3% and +3%
+            const change = Math.floor(Math.random() * 7) - 3;
+            const newValue = Math.max(40, Math.min(98, currentValue + change));
+            
+            gauge.style.width = `${newValue}%`;
+            if (gaugeValues[index]) {
+                gaugeValues[index].textContent = `${newValue}%`;
+            }
+        });
+        
+        // Update job runtime displays
+        const runtimeDisplays = document.querySelectorAll('.job-info-item:nth-child(6) span');
+        runtimeDisplays.forEach(display => {
+            if (display.textContent.includes(':')) {
+                const timeParts = display.textContent.split(':').map(part => parseInt(part));
+                
+                // Add seconds
+                timeParts[2] = (timeParts[2] || 0) + 5;
+                if (timeParts[2] >= 60) {
+                    timeParts[2] = 0;
+                    timeParts[1]++;
+                }
+                
+                // Handle minute overflow
+                if (timeParts[1] >= 60) {
+                    timeParts[1] = 0;
+                    timeParts[0]++;
+                }
+                
+                // Format and display
+                display.textContent = timeParts.map(t => t.toString().padStart(2, '0')).join(':');
+            }
         });
     }
 });
