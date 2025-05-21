@@ -488,6 +488,410 @@
                     </tbody>
                 </table>
             </div>
+            <!-- Rack Detail View (Initially Hidden) -->
+<div id="rack-detail-view" class="overlay-panel">
+    <div class="overlay-header">
+        <button id="back-to-overview" class="back-button">
+            <i class="fas fa-arrow-left"></i> Back to Cluster Overview
+        </button>
+        <h2 id="rack-detail-title">Rack Name</h2>
+        <div class="refresh-info">
+            Last updated: <span id="rack-detail-last-update">May 20, 2025 14:30:45</span>
+            <button id="rack-refresh-btn" class="refresh-button">
+                <i class="fas fa-sync-alt"></i> Refresh
+            </button>
+        </div>
+    </div>
+    
+    <div class="overlay-content">
+        <div class="rack-detail-grid">
+            <!-- Left column with 3D rack visualization -->
+            <div class="rack-visual-container">
+                <div class="rack-status-indicator online">
+                    <i class="fas fa-check-circle"></i> Online
+                </div>
+                
+                <div class="rack-3d-container">
+                    <div class="rack-3d">
+                        <div class="rack-face front">
+                            <div class="rack-door">
+                                <div class="rack-handle"></div>
+                                <div class="status-light"></div>
+                            </div>
+                        </div>
+                        <div class="rack-face back"></div>
+                        <div class="rack-face left"></div>
+                        <div class="rack-face right"></div>
+                        <div class="rack-face top"></div>
+                        <div class="rack-face bottom"></div>
+                    </div>
+                </div>
+                
+                <div class="rack-info-summary">
+                    <div class="rack-summary-item">
+                        <span class="label">Type:</span>
+                        <span id="rack-type" class="value">Compute</span>
+                    </div>
+                    <div class="rack-summary-item">
+                        <span class="label">Location:</span>
+                        <span id="rack-location" class="value">Data Center 2, Row 3</span>
+                    </div>
+                    <div class="rack-summary-item">
+                        <span class="label">Nodes:</span>
+                        <span id="rack-nodes-count" class="value">48/48 Online</span>
+                    </div>
+                    <div class="rack-summary-item">
+                        <span class="label">Power:</span>
+                        <span id="rack-power" class="value">8.2 kW / 12 kW</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Right column with node details -->
+            <div class="rack-details-container">
+                <div class="detail-section-tabs">
+                    <button class="tab-button active" data-tab="nodes-tab">Nodes</button>
+                    <button class="tab-button" data-tab="jobs-tab">Running Jobs</button>
+                    <button class="tab-button" data-tab="stats-tab">Statistics</button>
+                </div>
+                
+                <!-- Nodes Tab Content -->
+                <div id="nodes-tab" class="tab-content active">
+                    <div class="nodes-filter-bar">
+                        <div class="search-container">
+                            <input type="text" placeholder="Search nodes..." class="search-input">
+                            <i class="fas fa-search search-icon"></i>
+                        </div>
+                        <div class="filter-container">
+                            <select class="filter-select">
+                                <option value="all">All Status</option>
+                                <option value="online">Online</option>
+                                <option value="busy">Busy</option>
+                                <option value="idle">Idle</option>
+                                <option value="offline">Offline</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="nodes-grid">
+                        <!-- Node 1 -->
+                        <div class="node-card online">
+                            <div class="node-header">
+                                <h4>compute-1-01</h4>
+                                <span class="status-dot"></span>
+                            </div>
+                            <div class="node-body">
+                                <div class="node-stats">
+                                    <div class="node-stat">
+                                        <span class="label">CPU</span>
+                                        <div class="mini-gauge">
+                                            <div class="mini-gauge-fill" style="width: 85%;"></div>
+                                        </div>
+                                        <span class="value">85%</span>
+                                    </div>
+                                    <div class="node-stat">
+                                        <span class="label">Memory</span>
+                                        <div class="mini-gauge">
+                                            <div class="mini-gauge-fill" style="width: 72%;"></div>
+                                        </div>
+                                        <span class="value">72%</span>
+                                    </div>
+                                    <div class="node-stat">
+                                        <span class="label">Load</span>
+                                        <div class="mini-gauge">
+                                            <div class="mini-gauge-fill" style="width: 79%;"></div>
+                                        </div>
+                                        <span class="value">79%</span>
+                                    </div>
+                                </div>
+                                <div class="node-details">
+                                    <div class="detail-item">
+                                        <span class="label">Status:</span>
+                                        <span class="value busy">Busy (3 jobs)</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <span class="label">Uptime:</span>
+                                        <span class="value">32 days, 4 hours</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Node 2 -->
+                        <div class="node-card online">
+                            <div class="node-header">
+                                <h4>compute-1-02</h4>
+                                <span class="status-dot"></span>
+                            </div>
+                            <div class="node-body">
+                                <div class="node-stats">
+                                    <div class="node-stat">
+                                        <span class="label">CPU</span>
+                                        <div class="mini-gauge">
+                                            <div class="mini-gauge-fill" style="width: 92%;"></div>
+                                        </div>
+                                        <span class="value">92%</span>
+                                    </div>
+                                    <div class="node-stat">
+                                        <span class="label">Memory</span>
+                                        <div class="mini-gauge">
+                                            <div class="mini-gauge-fill" style="width: 88%;"></div>
+                                        </div>
+                                        <span class="value">88%</span>
+                                    </div>
+                                    <div class="node-stat">
+                                        <span class="label">Load</span>
+                                        <div class="mini-gauge">
+                                            <div class="mini-gauge-fill" style="width: 95%;"></div>
+                                        </div>
+                                        <span class="value">95%</span>
+                                    </div>
+                                </div>
+                                <div class="node-details">
+                                    <div class="detail-item">
+                                        <span class="label">Status:</span>
+                                        <span class="value busy">Busy (2 jobs)</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <span class="label">Uptime:</span>
+                                        <span class="value">32 days, 4 hours</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Node 3 -->
+                        <div class="node-card idle">
+                            <div class="node-header">
+                                <h4>compute-1-03</h4>
+                                <span class="status-dot"></span>
+                            </div>
+                            <div class="node-body">
+                                <div class="node-stats">
+                                    <div class="node-stat">
+                                        <span class="label">CPU</span>
+                                        <div class="mini-gauge">
+                                            <div class="mini-gauge-fill" style="width: 5%;"></div>
+                                        </div>
+                                        <span class="value">5%</span>
+                                    </div>
+                                    <div class="node-stat">
+                                        <span class="label">Memory</span>
+                                        <div class="mini-gauge">
+                                            <div class="mini-gauge-fill" style="width: 12%;"></div>
+                                        </div>
+                                        <span class="value">12%</span>
+                                    </div>
+                                    <div class="node-stat">
+                                        <span class="label">Load</span>
+                                        <div class="mini-gauge">
+                                            <div class="mini-gauge-fill" style="width: 8%;"></div>
+                                        </div>
+                                        <span class="value">8%</span>
+                                    </div>
+                                </div>
+                                <div class="node-details">
+                                    <div class="detail-item">
+                                        <span class="label">Status:</span>
+                                        <span class="value idle">Idle</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <span class="label">Uptime:</span>
+                                        <span class="value">32 days, 4 hours</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Node 4 -->
+                        <div class="node-card offline">
+                            <div class="node-header">
+                                <h4>compute-1-04</h4>
+                                <span class="status-dot"></span>
+                            </div>
+                            <div class="node-body">
+                                <div class="node-offline-message">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                    <span>Node offline - Maintenance</span>
+                                </div>
+                                <div class="node-details">
+                                    <div class="detail-item">
+                                        <span class="label">Status:</span>
+                                        <span class="value offline">Offline</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <span class="label">Since:</span>
+                                        <span class="value">May 19, 08:30</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Jobs Tab Content -->
+                <div id="jobs-tab" class="tab-content">
+                    <div class="rack-jobs-table-container">
+                        <table class="rack-jobs-table">
+                            <thead>
+                                <tr>
+                                    <th>Job ID</th>
+                                    <th>User</th>
+                                    <th>Nodes</th>
+                                    <th>Start Time</th>
+                                    <th>Runtime</th>
+                                    <th>Status</th>
+                                    <th>CPU Util</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>12350</td>
+                                    <td>jsmith42</td>
+                                    <td>compute-1-01, compute-1-02</td>
+                                    <td>May 20, 10:15</td>
+                                    <td>04:23:12</td>
+                                    <td><span class="status running">Running</span></td>
+                                    <td>
+                                        <div class="mini-gauge">
+                                            <div class="mini-gauge-fill" style="width: 85%;"></div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>12348</td>
+                                    <td>ayang3</td>
+                                    <td>compute-1-01</td>
+                                    <td>May 20, 09:45</td>
+                                    <td>04:52:26</td>
+                                    <td><span class="status running">Running</span></td>
+                                    <td>
+                                        <div class="mini-gauge">
+                                            <div class="mini-gauge-fill" style="width: 92%;"></div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>12346</td>
+                                    <td>mgarcia7</td>
+                                    <td>compute-1-02</td>
+                                    <td>May 20, 08:30</td>
+                                    <td>06:07:41</td>
+                                    <td><span class="status running">Running</span></td>
+                                    <td>
+                                        <div class="mini-gauge">
+                                            <div class="mini-gauge-fill" style="width: 78%;"></div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- Statistics Tab Content -->
+                <div id="stats-tab" class="tab-content">
+                    <div class="stats-grid">
+                        <div class="stats-card">
+                            <h3>CPU Utilization (Last 24h)</h3>
+                            <div class="chart-container">
+                                <div class="chart-placeholder">
+                                    <div class="chart-line" style="height: 80%; top: 20%"></div>
+                                    <div class="chart-line" style="height: 60%; top: 40%"></div>
+                                    <div class="chart-line" style="height: 40%; top: 60%"></div>
+                                    <div class="chart-line" style="height: 20%; top: 80%"></div>
+                                    
+                                    <div class="chart-bar" style="height: 65%"></div>
+                                    <div class="chart-bar" style="height: 85%"></div>
+                                    <div class="chart-bar" style="height: 75%"></div>
+                                    <div class="chart-bar" style="height: 90%"></div>
+                                    <div class="chart-bar" style="height: 70%"></div>
+                                    <div class="chart-bar" style="height: 60%"></div>
+                                    <div class="chart-bar" style="height: 80%"></div>
+                                    <div class="chart-bar" style="height: 75%"></div>
+                                    <div class="chart-bar" style="height: 65%"></div>
+                                    <div class="chart-bar" style="height: 85%"></div>
+                                    <div class="chart-bar" style="height: 95%"></div>
+                                    <div class="chart-bar" style="height: 70%"></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="stats-card">
+                            <h3>Memory Usage (Last 24h)</h3>
+                            <div class="chart-container">
+                                <div class="chart-placeholder">
+                                    <div class="chart-line" style="height: 80%; top: 20%"></div>
+                                    <div class="chart-line" style="height: 60%; top: 40%"></div>
+                                    <div class="chart-line" style="height: 40%; top: 60%"></div>
+                                    <div class="chart-line" style="height: 20%; top: 80%"></div>
+                                    
+                                    <div class="chart-bar" style="height: 55%"></div>
+                                    <div class="chart-bar" style="height: 65%"></div>
+                                    <div class="chart-bar" style="height: 60%"></div>
+                                    <div class="chart-bar" style="height: 75%"></div>
+                                    <div class="chart-bar" style="height: 85%"></div>
+                                    <div class="chart-bar" style="height: 70%"></div>
+                                    <div class="chart-bar" style="height: 65%"></div>
+                                    <div class="chart-bar" style="height: 75%"></div>
+                                    <div class="chart-bar" style="height: 80%"></div>
+                                    <div class="chart-bar" style="height: 85%"></div>
+                                    <div class="chart-bar" style="height: 70%"></div>
+                                    <div class="chart-bar" style="height: 60%"></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="stats-card">
+                            <h3>Jobs Per Day (Last Week)</h3>
+                            <div class="chart-container">
+                                <div class="chart-placeholder">
+                                    <div class="chart-line" style="height: 80%; top: 20%"></div>
+                                    <div class="chart-line" style="height: 60%; top: 40%"></div>
+                                    <div class="chart-line" style="height: 40%; top: 60%"></div>
+                                    <div class="chart-line" style="height: 20%; top: 80%"></div>
+                                    
+                                    <div class="chart-bar" style="height: 45%"></div>
+                                    <div class="chart-bar" style="height: 55%"></div>
+                                    <div class="chart-bar" style="height: 65%"></div>
+                                    <div class="chart-bar" style="height: 80%"></div>
+                                    <div class="chart-bar" style="height: 70%"></div>
+                                    <div class="chart-bar" style="height: 75%"></div>
+                                    <div class="chart-bar" style="height: 50%"></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="stats-card">
+                            <h3>Temperature (Last 24h)</h3>
+                            <div class="chart-container">
+                                <div class="chart-placeholder">
+                                    <div class="chart-line" style="height: 80%; top: 20%"></div>
+                                    <div class="chart-line" style="height: 60%; top: 40%"></div>
+                                    <div class="chart-line" style="height: 40%; top: 60%"></div>
+                                    <div class="chart-line" style="height: 20%; top: 80%"></div>
+                                    
+                                    <div class="chart-bar" style="height: 35%"></div>
+                                    <div class="chart-bar" style="height: 40%"></div>
+                                    <div class="chart-bar" style="height: 45%"></div>
+                                    <div class="chart-bar" style="height: 50%"></div>
+                                    <div class="chart-bar" style="height: 55%"></div>
+                                    <div class="chart-bar" style="height: 60%"></div>
+                                    <div class="chart-bar" style="height: 50%"></div>
+                                    <div class="chart-bar" style="height: 45%"></div>
+                                    <div class="chart-bar" style="height: 40%"></div>
+                                    <div class="chart-bar" style="height: 45%"></div>
+                                    <div class="chart-bar" style="height: 50%"></div>
+                                    <div class="chart-bar" style="height: 45%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
         </main>
 
         <footer class="dashboard-footer">

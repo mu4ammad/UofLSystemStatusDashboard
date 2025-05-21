@@ -64,8 +64,202 @@ document.addEventListener('DOMContentLoaded', function() {
             // Failed login
             loginError.textContent = 'Invalid username or password. Please try again.';
         }
+
+        initRackDetailView();
     });
 
+    // Initialize rack detail view
+    function initRackDetailView() {
+    // Get all rack cards
+    const rackCards = document.querySelectorAll('.rack-card');
+    
+    // Add click event to each rack card
+    rackCards.forEach(rack => {
+        rack.addEventListener('click', function() {
+            const rackName = this.querySelector('h4').textContent;
+            const isOnline = this.querySelector('.status-badge').classList.contains('online');
+            
+            // Set rack detail information
+            document.getElementById('rack-detail-title').textContent = rackName;
+            document.getElementById('rack-type').textContent = getRackType(rackName);
+            
+            // Update 3D rack status
+            const rack3d = document.querySelector('.rack-3d');
+            const rackStatusIndicator = document.querySelector('.rack-status-indicator');
+            
+            if (isOnline) {
+                rack3d.classList.remove('offline');
+                rack3d.classList.add('online');
+                rackStatusIndicator.classList.remove('offline');
+                rackStatusIndicator.classList.add('online');
+                rackStatusIndicator.innerHTML = '<i class="fas fa-check-circle"></i> Online';
+            } else {
+                rack3d.classList.remove('online');
+                rack3d.classList.add('offline');
+                rackStatusIndicator.classList.remove('online');
+                rackStatusIndicator.classList.add('offline');
+                rackStatusIndicator.innerHTML = '<i class="fas fa-exclamation-circle"></i> Offline';
+            }
+            
+            // Show the rack detail view
+            document.getElementById('rack-detail-view').classList.add('active');
+            
+            // Update timestamp
+            const now = new Date();
+            const timeString = now.toLocaleString();
+            document.getElementById('rack-detail-last-update').textContent = timeString;
+            
+            // Start updating node stats
+            startNodeStatsUpdates();
+        });
+    });
+    
+    // Back button functionality
+    document.getElementById('back-to-overview').addEventListener('click', function() {
+        document.getElementById('rack-detail-view').classList.remove('active');
+        stopNodeStatsUpdates();
+    });
+    
+    // Tab switching functionality
+    const tabButtons = document.querySelectorAll('.tab-button');
+    tabButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const tabId = this.getAttribute('data-tab');
+            
+            // Remove active class from all tabs and buttons
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Add active class to selected tab and button
+            document.getElementById(tabId).classList.add('active');
+            this.classList.add('active');
+        });
+    });
+    
+    // Rack refresh button
+    const rackRefreshBtn = document.getElementById('rack-refresh-btn');
+    if (rackRefreshBtn) {
+        rackRefreshBtn.addEventListener('click', function() {
+            updateNodeStats();
+            
+            // Update timestamp
+            const now = new Date();
+            const timeString = now.toLocaleString();
+            document.getElementById('rack-detail-last-update').textContent = timeString;
+            
+            // Add a refreshing animation
+            this.classList.add('refreshing');
+            setTimeout(() => {
+                this.classList.remove('refreshing');
+            }, 1000);
+        });
+    }
+}
+
+// Get rack type based on name
+function getRackType(rackName) {
+    if (rackName.includes('Compute')) {
+        return 'Compute';
+    } else if (rackName.includes('GPU')) {
+        return 'GPU';
+    } else if (rackName.includes('High-Mem')) {
+        return 'High Memory';
+    } else if (rackName.includes('Storage')) {
+        return 'Storage';
+    } else if (rackName.includes('Interactive')) {
+        return 'Interactive';
+    } else if (rackName.includes('Management')) {
+        return 'Management';
+    } else {
+        return 'General Purpose';
+    }
+}
+
+// Node stats updates
+let nodeStatsInterval;
+
+// Start node stats updates
+function startNodeStatsUpdates() {
+    // Update immediately
+    updateNodeStats();
+    
+    // Then update every 5 seconds
+    nodeStatsInterval = setInterval(function() {
+        updateNodeStats();
+    }, 5000);
+}
+
+// Stop node stats updates
+function stopNodeStatsUpdates() {
+    clearInterval(nodeStatsInterval);
+}
+
+// Update node stats with random fluctuations
+function updateNodeStats() {
+    // Update node gauges with small random changes
+    const nodeGauges = document.querySelectorAll('.node-card:not(.offline) .mini-gauge-fill');
+    const gaugeValues = document.querySelectorAll('.node-card:not(.offline) .node-stat .value');
+    
+    nodeGauges.forEach((gauge, index) => {
+        if (gauge.closest('.node-card').classList.contains('idle')) {
+            // Idle nodes have low utilization
+            const newValue = Math.max(5, Math.min(15, Math.floor(Math.random() * 10) + 5));
+            gauge.style.width = `${newValue}%`;
+            
+            // Update the corresponding value text if it exists
+            if (gaugeValues[index]) {
+                gaugeValues[index].textContent = `${newValue}%`;
+            }
+        } else {
+            // Busy nodes have high utilization
+            let currentValue = parseInt(gauge.style.width);
+            if (isNaN(currentValue)) currentValue = 70; // Default if not set
+            
+            // Random fluctuation between -5% and +5%
+            const change = Math.floor(Math.random() * 11) - 5;
+            const newValue = Math.max(60, Math.min(98, currentValue + change));
+            
+            gauge.style.width = `${newValue}%`;
+            
+            // Update the corresponding value text if it exists
+            if (gaugeValues[index]) {
+                gaugeValues[index].textContent = `${newValue}%`;
+            }
+        }
+    });
+    
+    // Update job table gauges
+    const jobGauges = document.querySelectorAll('.rack-jobs-table .mini-gauge-fill');
+    jobGauges.forEach(gauge => {
+        let currentValue = parseInt(gauge.style.width);
+        if (isNaN(currentValue)) currentValue = 70; // Default if not set
+        
+        // Random fluctuation between -3% and +3%
+        const change = Math.floor(Math.random() * 7) - 3;
+        const newValue = Math.max(50, Math.min(98, currentValue + change));
+        
+        gauge.style.width = `${newValue}%`;
+    });
+    
+    // Update stats charts
+    const chartBars = document.querySelectorAll('.chart-bar');
+    chartBars.forEach(bar => {
+        let currentHeight = parseInt(bar.style.height);
+        if (isNaN(currentHeight)) currentHeight = 70; // Default if not set
+        
+        // Random fluctuation between -5% and +5%
+        const change = Math.floor(Math.random() * 11) - 5;
+        const newHeight = Math.max(20, Math.min(95, currentHeight + change));
+        
+        bar.style.height = `${newHeight}%`;
+        bar.setAttribute('data-value', `${newHeight}%`);
+    });
+}
     // Handle admin logout
     if (adminLogoutBtn) {
         adminLogoutBtn.addEventListener('click', function() {
